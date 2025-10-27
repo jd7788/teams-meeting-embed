@@ -1,97 +1,39 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>在线会议 - 您的公司</title>
-  <!-- 引入官方 TeamsJS SDK（v2.13.0 是当前稳定版） -->
+  <meta charset="utf-8">
+  <title>Teams 会议</title>
   <script src="https://res.cdn.office.net/teams-js/2.13.0/js/teams.min.js"></script>
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    #meeting-container {
-      width: 100%;
-      height: calc(100vh - 100px);
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #0078d4;
-    }
+    body { margin: 0; padding: 0; height: 100vh; }
+    #meeting { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
-  <h1>正在加入视频会议...</h1>
-  <div id="meeting-container"></div>
-
+  <div id="meeting"></div>
   <script>
-    // 👇 替换为你的实际会议链接
-    const MEETING_LINK = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_NTRhNTk5NTItZWIzMC00YjAzLWE4NTQtOGE0NzE4MGQ3ZmVl%40thread.v2/0?context=%7b%22Tid%22%3a%224305b9f4-4170-476e-85f7-b9925b2131c3%22%2c%22Oid%22%3a%22ca8cac15-e045-4aa7-a2a9-adbbfa234f4c%22%7d";
+    // 🔑 替换为你的实际会议链接（必须允许匿名加入）
+    const MEETING_LINK = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_xxxxxx%40thread.v2/0?context=...";
 
-    async function embedMeeting() {
+    async function start() {
       try {
-        // 1. 初始化 Teams SDK
         await microsoftTeams.app.initialize();
-
-        // 2. 创建会议嵌入实例
-        const meetingEmbed = microsoftTeams.meeting.createMeetingEmbed(
-          document.getElementById("meeting-container"),
-          {
-            meetingLink: MEETING_LINK,
-            locale: "zh-CN" // 可选：设置语言
-          }
+        const embed = microsoftTeams.meeting.createMeetingEmbed(
+          document.getElementById("meeting"),
+          { meetingLink: MEETING_LINK, locale: "zh-CN" }
         );
-
-        // 3. 加载会议
-        await meetingEmbed.load();
-        console.log("✅ Teams 会议已成功嵌入");
-
-        // 4. 可选：监听生命周期事件
-        meetingEmbed.registerOnLoadHandler(() => {
-          console.log("会议界面完全加载");
-        });
-
-        meetingEmbed.registerBeforeUnloadHandler(() => {
-          console.log("用户即将离开会议");
-        });
-
-      } catch (error) {
-        console.error("❌ 嵌入失败:", error);
-        document.body.innerHTML = `
-          <h1>无法加载会议</h1>
-          <p>请稍后重试，或<a href="${MEETING_LINK}" target="_blank">点击此处直接加入</a>。</p>
-        `;
+        await embed.load();
+      } catch (e) {
+        console.error("会议加载失败:", e);
+        document.body.innerHTML = `<div style="padding:50px;text-align:center;">
+          <h2>无法加载会议</h2>
+          <a href="${MEETING_LINK}" target="_blank" style="display:inline-block;padding:10px 20px;background:#0078d4;color:white;text-decoration:none;border-radius:4px;">
+            点击直接加入
+          </a>
+        </div>`;
       }
     }
-
-    // 页面加载完成后执行
-    window.addEventListener("DOMContentLoaded", embedMeeting);
+    window.addEventListener("DOMContentLoaded", start);
   </script>
-} catch (error) {
-  console.error("❌ 嵌入失败:", error);
-  let msg = "未知错误";
-  if (error.message?.includes("anonymous")) {
-    msg = "会议未允许匿名用户加入";
-  } else if (error.message?.includes("CSP") || error.message?.includes("frame")) {
-    msg = "内容安全策略(CSP)阻止加载，请检查 _headers";
-  } else if (error.name === "InvalidMeetingLink") {
-    msg = "会议链接无效或已过期";
-  }
-  document.body.innerHTML = `
-    <div style="padding: 50px; text-align: center; color: #d32f2f;">
-      <h2>无法加载会议</h2>
-      <p>原因: ${msg}</p>
-      <p>错误详情: ${error.message}</p>
-      <a href="${MEETING_LINK}" target="_blank" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #1890ff; color: white; text-decoration: none; border-radius: 4px;">直接加入会议</a>
-    </div>
-  `;
-}
 </body>
 </html>
-
-
-
