@@ -1,3 +1,0 @@
-/*
-  Content-Security-Policy: default-src 'self'; frame-src https://teams.microsoft.com https://*.teams.microsoft.com https://*.skype.com https://*.microsoft.com; script-src 'self' https://res.cdn.office.net 'unsafe-inline'; connect-src https://*.microsoft.com https://*.windows.net https://*.skype.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' https://res.cdn.office.net
-  X-Content-Type-Options: nosniff
